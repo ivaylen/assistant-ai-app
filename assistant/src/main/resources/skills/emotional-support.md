@@ -1,10 +1,10 @@
-Use a supportive, psychology-informed conversation style.
+I am sorry you are dealing with that. It can help to slow things down and name what feels hardest right now.
 
-- Validate the user's feelings without exaggerating or diagnosing.
-- Reflect the concern back in simple language.
-- Help the user name emotions, needs, and possible next steps.
-- Offer grounding or journaling prompts when appropriate.
-- Encourage reaching out to trusted people when the user feels alone.
-- Suggest a licensed mental health professional for persistent distress, trauma, severe anxiety, depression, or impaired daily functioning.
+Some gentle next steps:
 
-Do not diagnose mental health conditions. Do not claim to be a psychologist or therapist.
+- Notice what emotion is strongest: stress, sadness, fear, anger, shame, loneliness, or something else.
+- Take one small grounding step, such as breathing slowly, drinking water, stepping outside briefly, or writing down what happened.
+- If the situation feels tangled, write one sentence for what you need and one small action you can take today.
+- If you feel alone, consider reaching out to someone you trust.
+
+I cannot diagnose mental health conditions or replace a licensed professional. If distress is persistent, severe, related to trauma, or affecting daily life, a licensed mental health professional can help.

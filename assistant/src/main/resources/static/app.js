@@ -9,7 +9,7 @@
 		const [question, setQuestion] = useState("");
 		const [messages, setMessages] = useState([{
 			role: "assistant",
-			content: "Hello, what is your condition? How can I help you?"
+			content: "Hello, what symptoms are you experiencing? How can I help you?"
 		}]);
 		const [appointments, setAppointments] = useState([]);
 		const [loading, setLoading] = useState(false);

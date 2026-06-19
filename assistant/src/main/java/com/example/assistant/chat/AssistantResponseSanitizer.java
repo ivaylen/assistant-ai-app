@@ -5,6 +5,7 @@ import com.example.assistant.tool.WellbeingSupportTools;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
@@ -37,33 +38,44 @@ class AssistantResponseSanitizer {
 	}
 
 	String clean(String response, String userQuestion) {
+		return clean(response, userQuestion, this::fallbackGuidance);
+	}
+
+	String clean(String response, String userQuestion, Supplier<String> modelFallback) {
 		if (!StringUtils.hasText(response)) {
 			return "I could not prepare a clear answer right now. Please try asking again.";
 		}
 
 		var trimmed = response.trim();
 		if (looksLikeToolCall(trimmed)) {
-			return recoverToolGuidance(trimmed, userQuestion);
+			return recoverToolGuidance(trimmed, userQuestion, modelFallback);
 		}
 
 		return response;
 	}
 
-	private String recoverToolGuidance(String response, String userQuestion) {
+	private String recoverToolGuidance(String response, String userQuestion, Supplier<String> modelFallback) {
 		var toolCall = parseToolCall(response);
 		if (toolCall == null) {
-			return recoverFromRawToolName(response, userQuestion);
+			return recoverFromRawToolName(response, userQuestion, modelFallback);
 		}
 
 		if ("medical_safety_guidance".equals(toolCall.name())) {
 			var symptoms = firstText(toolCall.arguments(), "symptoms", "symptom", "health_concern", "concern");
 			var context = firstText(toolCall.arguments(), "context", "extra_context", "duration", "severity");
+			var effectiveSymptoms = StringUtils.hasText(symptoms) ? symptoms : userQuestion;
+			if (!medicalSafetyTools.hasSpecificGuidance(effectiveSymptoms, context)) {
+				return modelFallback.get();
+			}
 			return medicalSafetyTools.medicalSafetyGuidance(
-					StringUtils.hasText(symptoms) ? symptoms : userQuestion,
+					effectiveSymptoms,
 					context);
 		}
 
 		if ("wellbeing_support_guidance".equals(toolCall.name())) {
+			if (looksMedicalQuestion(userQuestion)) {
+				return modelFallback.get();
+			}
 			var concern = firstText(toolCall.arguments(), "concern", "question", "topic");
 			var context = firstText(toolCall.arguments(), "context", "extra_context", "situation");
 			return wellbeingSupportTools.wellbeingSupportGuidance(
@@ -74,15 +86,50 @@ class AssistantResponseSanitizer {
 		return fallbackGuidance();
 	}
 
-	private String recoverFromRawToolName(String response, String userQuestion) {
+	private String recoverFromRawToolName(String response, String userQuestion, Supplier<String> modelFallback) {
 		var lower = response.toLowerCase();
 		if (lower.contains("medical_safety_guidance")) {
+			if (!medicalSafetyTools.hasSpecificGuidance(userQuestion, null)) {
+				return modelFallback.get();
+			}
 			return medicalSafetyTools.medicalSafetyGuidance(userQuestion, null);
 		}
 		if (lower.contains("wellbeing_support_guidance")) {
+			if (looksMedicalQuestion(userQuestion)) {
+				return modelFallback.get();
+			}
 			return wellbeingSupportTools.wellbeingSupportGuidance(userQuestion, null);
 		}
 		return fallbackGuidance();
+	}
+
+	private boolean looksMedicalQuestion(String userQuestion) {
+		var text = userQuestion == null ? "" : userQuestion.toLowerCase();
+		return List.of(
+				"acne",
+				"ackne",
+				"pimple",
+				"skin",
+				"rash",
+				"pain",
+				"hurt",
+				"ache",
+				"fever",
+				"cough",
+				"cold",
+				"bite",
+				"cut",
+				"wound",
+				"blood",
+				"swelling",
+				"headache",
+				"stomach",
+				"nausea",
+				"vomit",
+				"dizzy",
+				"symptom")
+				.stream()
+				.anyMatch(text::contains);
 	}
 
 	private ToolCall parseToolCall(String response) {

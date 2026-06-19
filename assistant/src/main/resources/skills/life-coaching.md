@@ -1,10 +1,10 @@
-Use a practical life-coaching style.
+A practical way forward is to make the goal smaller and clearer.
 
-- Help the user clarify what they want.
-- Ask one or two focused questions when the goal is vague.
-- Break big goals into small next actions.
-- Encourage reflection without judging.
-- Prefer concrete plans, tradeoffs, habits, and accountability.
-- Avoid pretending to know the user's life better than they do.
+Try this:
 
-Do not present coaching as therapy or clinical treatment.
+- Write down what you want to change in one sentence.
+- Choose one small action you can take today.
+- Remove one obvious obstacle if you can.
+- Decide when you will check in with yourself again.
+
+If the issue is emotional, persistent, or affecting daily life, consider speaking with a licensed professional. Coaching-style guidance is not therapy or clinical treatment.

@@ -19,22 +19,44 @@ public class MedicalSafetyTools {
 			@ToolParam(description = "The symptoms or health concern described by the user") String symptoms,
 			@ToolParam(required = false, description = "Any extra context, such as duration, age, trigger, or severity") String context) {
 		var text = ((symptoms == null ? "" : symptoms) + " " + (context == null ? "" : context)).toLowerCase();
+		var skillName = guidanceSkillName(text);
 
-		if (containsAny(text, "chest pain", "trouble breathing", "shortness of breath", "stroke",
-				"face drooping", "severe allergic", "anaphylaxis", "suicidal", "major bleeding",
-				"loss of consciousness", "confusion", "seizure")) {
-			return loadSkill("emergency-red-flags.md");
-		}
-
-		if (containsAny(text, "sun", "heat", "hot weather", "dehydration", "heat exhaustion")) {
-			return loadSkill("sun-headache.md");
-		}
-
-		if (containsAny(text, "headache", "migraine")) {
-			return loadSkill("headache.md");
+		if (skillName != null) {
+			return loadSkill(skillName);
 		}
 
 		return loadSkill("general-medical-safety.md");
+	}
+
+	public boolean hasSpecificGuidance(String symptoms, String context) {
+		var text = ((symptoms == null ? "" : symptoms) + " " + (context == null ? "" : context)).toLowerCase();
+		return guidanceSkillName(text) != null;
+	}
+
+	private String guidanceSkillName(String text) {
+		if (containsAny(text, "chest pain", "trouble breathing", "shortness of breath", "stroke",
+				"face drooping", "severe allergic", "anaphylaxis", "suicidal", "major bleeding",
+				"loss of consciousness", "confusion", "seizure")) {
+			return "emergency-red-flags.md";
+		}
+
+		if (containsAny(text, "sun", "heat", "hot weather", "dehydration", "heat exhaustion")) {
+			return "sun-headache.md";
+		}
+
+		if (containsAny(text, "headache", "migraine")) {
+			return "headache.md";
+		}
+
+		if (containsAny(text, "cut", "scrape", "wound", "bleeding", "blood", "finger injury")) {
+			return "minor-cut.md";
+		}
+
+		if (containsAny(text, "mosquito", "insect bite", "bug bite", "bite", "stung", "sting")) {
+			return "insect-bite.md";
+		}
+
+		return null;
 	}
 
 	private String loadSkill(String fileName) {
