@@ -6,6 +6,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import com.example.assistant.tool.MedicalSafetyTools;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,9 +29,15 @@ class ChatMemoryConfiguration {
 	}
 
 	@Bean
-	ChatClient chatClient(ChatClient.Builder builder, MessageChatMemoryAdvisor promptChatMemoryAdvisor) {
+	ChatClient chatClient(
+			ChatClient.Builder builder,
+			MessageChatMemoryAdvisor promptChatMemoryAdvisor,
+			MedicalSafetyTools medicalSafetyTools,
+			@Value("${assistant.system-prompt}") String systemPrompt) {
 		return builder
+				.defaultSystem(systemPrompt)
 				.defaultAdvisors(promptChatMemoryAdvisor)
+				.defaultTools(medicalSafetyTools)
 				.build();
 	}
 
