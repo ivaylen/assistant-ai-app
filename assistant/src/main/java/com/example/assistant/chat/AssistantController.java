@@ -17,9 +17,12 @@ class AssistantController {
 	}
 
 	@GetMapping("/ask")
-	String ask(@RequestParam String question) {
+	String ask(
+			@RequestParam String question,
+			@RequestParam(defaultValue = "default") String conversationId) {
 		return this.ai
 				.prompt()
+				.advisors((advisor) -> advisor.param("chat_memory_conversation_id", conversationId))
 				.user(question)
 				.call()
 				.content();
