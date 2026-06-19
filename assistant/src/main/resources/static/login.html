@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign In</title>
+	<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+	<main class="auth-page">
+		<section class="auth-panel">
+			<h1>Doctor Assistant</h1>
+			<p>Sign in with your local account or create an account with Google.</p>
+
+			<form class="auth-form" action="/login" method="post">
+				<label for="username">Username</label>
+				<input id="username" name="username" autocomplete="username" required>
+
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password" autocomplete="current-password" required>
+
+				<button type="submit">Sign in</button>
+			</form>
+
+			<p class="auth-note"><a href="/signup.html">Create a local account</a></p>
+
+			<div class="auth-separator">or</div>
+
+			<a id="googleLogin" class="oauth-button oauth-hidden" href="/oauth2/authorization/google">Sign up or sign in with Google</a>
+			<p id="googleUnavailable" class="auth-note">Google signup is not configured yet. Use the local development account.</p>
+		</section>
+	</main>
+	<script>
+		const loginParams = new URLSearchParams(window.location.search);
+		if (loginParams.get("registered") === "true") {
+			const note = document.createElement("p");
+			note.className = "auth-success";
+			note.textContent = "Account created. Sign in to continue.";
+			document.querySelector(".auth-panel").insertBefore(note, document.querySelector(".auth-form"));
+		}
+
+		fetch("/api/auth/providers")
+			.then((response) => response.json())
+			.then((providers) => {
+				document.getElementById("googleLogin").classList.toggle("oauth-hidden", !providers.googleEnabled);
+				document.getElementById("googleUnavailable").classList.toggle("oauth-hidden", providers.googleEnabled);
+			});
+	</script>
+</body>
+</html>

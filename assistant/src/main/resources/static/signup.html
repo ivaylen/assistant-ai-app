@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Create Account</title>
+	<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+	<main class="auth-page">
+		<section class="auth-panel">
+			<h1>Create Account</h1>
+			<p>Register a local assistant account.</p>
+
+			<p id="signupError" class="auth-error oauth-hidden">That username is already taken.</p>
+
+			<form class="auth-form" action="/signup" method="post">
+				<label for="firstName">First name</label>
+				<input id="firstName" name="firstName" autocomplete="given-name" required>
+
+				<label for="lastName">Last name</label>
+				<input id="lastName" name="lastName" autocomplete="family-name" required>
+
+				<label for="age">Age</label>
+				<input id="age" name="age" type="number" min="1" max="130" inputmode="numeric" required>
+
+				<label for="phoneNumber">Phone number</label>
+				<input id="phoneNumber" name="phoneNumber" autocomplete="tel" required>
+
+				<label for="username">Username</label>
+				<input id="username" name="username" autocomplete="username" required>
+
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password" autocomplete="new-password" minlength="6" required>
+
+				<button type="submit">Create account</button>
+			</form>
+
+			<p class="auth-note"><a href="/login.html">Back to sign in</a></p>
+		</section>
+	</main>
+	<script>
+		const params = new URLSearchParams(window.location.search);
+		document.getElementById("signupError").classList.toggle("oauth-hidden", params.get("error") !== "username");
+	</script>
+</body>
+</html>
