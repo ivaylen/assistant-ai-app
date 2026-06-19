@@ -39,7 +39,7 @@ class AssistantController {
 			@RequestParam(defaultValue = "default") String conversationId,
 			Authentication authentication) {
 		var username = authentication == null ? "anonymous" : authentication.getName();
-		return responseSanitizer.clean(askAi(question, conversationId, username));
+		return responseSanitizer.clean(askAi(question, conversationId, username), question);
 	}
 
 	@PostMapping("/api/chat")
@@ -54,7 +54,8 @@ class AssistantController {
 					return new ChatResponse("I created appointment request " + result.id()
 							+ ". This is a request, not a confirmed appointment. The clinic should confirm it.");
 				})
-				.orElseGet(() -> new ChatResponse(responseSanitizer.clean(askAi(request.question(), conversationId, username))));
+				.orElseGet(() -> new ChatResponse(
+						responseSanitizer.clean(askAi(request.question(), conversationId, username), request.question())));
 	}
 
 	@GetMapping("/api/me")
