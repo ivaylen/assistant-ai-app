@@ -24,7 +24,8 @@ class AssistantResponseSanitizer {
 	private static final List<String> TOOL_NAMES = List.of(
 			"medical_safety_guidance",
 			"wellbeing_support_guidance",
-			"schedule_appointment");
+			"schedule_appointment",
+			"web_search");
 
 	AssistantResponseSanitizer(
 			MedicalSafetyTools medicalSafetyTools,
@@ -83,6 +84,11 @@ class AssistantResponseSanitizer {
 					context);
 		}
 
+		if ("web_search".equals(toolCall.name())) {
+			var withoutToolCall = stripLeadingToolCall(response);
+			return StringUtils.hasText(withoutToolCall) ? withoutToolCall : modelFallback.get();
+		}
+
 		return fallbackGuidance();
 	}
 
@@ -100,7 +106,69 @@ class AssistantResponseSanitizer {
 			}
 			return wellbeingSupportTools.wellbeingSupportGuidance(userQuestion, null);
 		}
+		if (lower.contains("web_search")) {
+			var withoutToolCall = stripLeadingToolCall(response);
+			return StringUtils.hasText(withoutToolCall) ? withoutToolCall : modelFallback.get();
+		}
 		return fallbackGuidance();
+	}
+
+	private String stripLeadingToolCall(String response) {
+		var trimmed = response.trim();
+		var jsonEnd = findLeadingJsonEnd(trimmed);
+		if (jsonEnd >= 0) {
+			return trimmed.substring(jsonEnd + 1).trim();
+		}
+
+		return response;
+	}
+
+	private int findLeadingJsonEnd(String text) {
+		if (!text.startsWith("{") && !text.startsWith("[")) {
+			return -1;
+		}
+
+		var stack = new java.util.ArrayDeque<Character>();
+		var inString = false;
+		var escaped = false;
+
+		for (int i = 0; i < text.length(); i++) {
+			var character = text.charAt(i);
+
+			if (inString) {
+				if (escaped) {
+					escaped = false;
+				}
+				else if (character == '\\') {
+					escaped = true;
+				}
+				else if (character == '"') {
+					inString = false;
+				}
+				continue;
+			}
+
+			if (character == '"') {
+				inString = true;
+			}
+			else if (character == '{' || character == '[') {
+				stack.push(character);
+			}
+			else if (character == '}' || character == ']') {
+				if (stack.isEmpty()) {
+					return -1;
+				}
+				var opening = stack.pop();
+				if ((opening == '{' && character != '}') || (opening == '[' && character != ']')) {
+					return -1;
+				}
+				if (stack.isEmpty()) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
 	}
 
 	private boolean looksMedicalQuestion(String userQuestion) {

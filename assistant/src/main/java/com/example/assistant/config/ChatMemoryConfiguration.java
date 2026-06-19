@@ -1,15 +1,18 @@
 package com.example.assistant.config;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import com.example.assistant.appointment.AppointmentTools;
 import com.example.assistant.tool.MedicalSafetyTools;
 import com.example.assistant.tool.WellbeingSupportTools;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,11 +40,19 @@ class ChatMemoryConfiguration {
 			AppointmentTools appointmentTools,
 			MedicalSafetyTools medicalSafetyTools,
 			WellbeingSupportTools wellbeingSupportTools,
-			@Value("${assistant.system-prompt}") String systemPrompt) {
+			ObjectProvider<ToolCallbackProvider> toolCallbackProviders,
+			@Value("${assistant.system-prompt}") String systemPrompt,
+			@Value("${assistant.search-instructions:}") String searchInstructions) {
+		var tools = new ArrayList<Object>();
+		tools.add(medicalSafetyTools);
+		tools.add(appointmentTools);
+		tools.add(wellbeingSupportTools);
+		toolCallbackProviders.stream().forEach(tools::add);
+
 		return builder
-				.defaultSystem(systemPrompt)
+				.defaultSystem((systemPrompt + " " + searchInstructions).trim())
 				.defaultAdvisors(promptChatMemoryAdvisor)
-				.defaultTools(medicalSafetyTools, appointmentTools, wellbeingSupportTools)
+				.defaultTools(tools.toArray())
 				.build();
 	}
 
