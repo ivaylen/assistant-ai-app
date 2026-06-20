@@ -63,9 +63,27 @@ Important local services:
 ```text
 Spring app: http://localhost:8080
 PostgreSQL: localhost:5433
-Database: mydatabase
-User: root
-Password: secret
+```
+
+Local database credentials are loaded from `assistant/.env.properties`. This file is ignored by git.
+
+Create it from the example file:
+
+```powershell
+cd "C:\Users\Ivaylo Andreev\Desktop\Projects\assistant-ai-app\assistant"
+copy .env.properties.example .env.properties
+```
+
+Then edit `assistant/.env.properties` for your local database values:
+
+```properties
+POSTGRES_DB=mydatabase
+POSTGRES_USER=root
+POSTGRES_PASSWORD=your-local-password
+
+ASSISTANT_DB_URL=jdbc:postgresql://localhost:5433/mydatabase
+ASSISTANT_DB_USERNAME=root
+ASSISTANT_DB_PASSWORD=your-local-password
 ```
 
 Start PostgreSQL:

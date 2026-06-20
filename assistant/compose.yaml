@@ -2,10 +2,8 @@ services:
   postgres:
     image: pgvector/pgvector:pg17
     container_name: assistant-postgres
-    environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: secret
+    env_file:
+      - .env.properties
     ports:
       - "5433:5432"
     volumes:
